@@ -1,6 +1,7 @@
 {
-  "name": "LocalNotify",
-  "app_id": "",
-  "v2": true,
-  "typescript": true
+  "name": "notify-me",
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "angular"
 }

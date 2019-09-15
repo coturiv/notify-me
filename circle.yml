@@ -1,0 +1,134 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+
+defaults: &defaults
+  working_directory: ~/repo
+  docker:
+      # specify the version you desire here
+      - image: coturiv/ci-cordova
+
+version: 2
+jobs:
+  angular:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: ~/repo
+
+      # Authenticate to npm
+      # - run:
+      #     name: Authenticate to npm
+      #     command: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/repo/.npmrc
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - npm-deps-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - npm-deps-
+
+      - run: npm install --no-progress
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: npm-deps-{{ checksum "package.json" }}
+        
+      # run test!
+      - run:
+          name: Testing
+          command: |
+            npm run lint
+            # npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI
+            # npm run e2e -- --protractor-config=e2e/protractor-ci.conf.js
+      
+      # run build!
+      - run:
+          name: Build
+          command: ionic build --prod
+
+  android:
+    <<: *defaults
+    steps:
+      - checkout
+
+      - attach_workspace:
+          at: ~/repo
+
+      - restore_cache:
+          keys:
+          - npm-deps-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - npm-deps-
+
+      # Download and cache plugins
+      - restore_cache:
+          keys:
+          - plugins-{{ checksum "config.xml" }}
+          # fallback to using the latest cache if no exact match is found
+          - plugins-
+
+      - run: ionic cordova platform add android
+
+      - save_cache:
+          paths:
+            - plugins
+          key: plugins-{{ checksum "config.xml" }}
+
+      # Download and cache gradle
+      - restore_cache:
+          key: jars-{{ checksum "platforms/android/build.gradle" }} \
+                   -{{ checksum "platforms/android/app/build.gradle" }}
+
+      # run build!
+      - run:
+          name: Building android
+          command: ionic cordova build android --prod
+          # command: cordova build android --release
+
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "platforms/android/build.gradle" }} \
+                   -{{ checksum "platforms/android/app/build.gradle" }} 
+
+      # Signing and Optimizing (TBD)
+      # - run:
+      #     name: Signing and Optimizing apk
+      #     command: ./builds/sign-apk.sh
+
+      # Artifacts
+      # - store_artifacts:
+      #     path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
+      #     destination: apks/
+
+      # - run:
+      #     name: Upload to Slack
+      #     command: |
+      #       export GIT_COMMIT_DESC=$(git log --format=oneline -n 1 | sed -E 's/^[^ ]+ (.*)$/\1/g')
+      #       curl -F file=@platforms/android/app/build/outputs/apk/debug/app-debug.apk -F channels=$SLACK_CHANNEL -F token=$SLACK_API_TOKEN -F title="${CIRCLE_PROJECT_REPONAME} | branch -> ${CIRCLE_BRANCH} | commit -> ${GIT_COMMIT_DESC}"  https://slack.com/api/files.upload
+             
+workflows:
+  version: 2
+  builds:
+    jobs:
+      - angular
+      # - angular:
+      #     filters:
+      #       branches:
+      #         ignore:
+      #           - develop
+      - android:
+          requires:
+            - angular
+          filters:
+            branches:
+              only:
+                - release
+      # - ios:
+      #     requires:
+      #       - angular

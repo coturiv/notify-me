@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Notify Me
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="ion-padding">
+    The world is your oyster.
+    <p>If you get lost, the <a target="_blank" rel="noopener" href="https://ionicframework.com/docs/">docs</a> will be your guide.</p>
+  </div>
+
+  <ion-list lines="full">  
+    <ion-item>
+      <ion-label>Repeat</ion-label>
+      <ion-select [(ngModel)]="repeat" placeholder="Select One">
+        <ion-select-option value="daily">Daily</ion-select-option>
+        <ion-select-option value="friday">Every Friday</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Time</ion-label>
+      <ion-datetime [(ngModel)]="notifyAt" displayFormat="hh:mm A" pickerFormat="hh mm A" placeholder="Select Time"></ion-datetime>
+    </ion-item>
+  
+  </ion-list>
+
+  
+
+</ion-content>
+
+<ion-footer class="ion-margin-bottom">
+
+  <ion-button expand="block" shape="round" color="secondary" (click)="onSchedule()">
+    Schedule
+  </ion-button>
+  <ion-button expand="block" shape="round" color="danger" (click)="onCancel()" >
+    Cancel All
+  </ion-button>
+</ion-footer>

@@ -1,0 +1,72 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "major": {
+    "automerge": true
+  },
+  "automerge": true,
+  "branchPrefix": "deps/",
+  "rebaseStalePrs": true,
+  "separateMajorMinor": false,
+  "semanticCommits": true,
+  "semanticPrefix": "chore",
+  "commitMessage": "{{semanticPrefix}} update {{depName}} to version {{newVersion}}",
+  "labels": [
+    "deps"
+  ],
+  "schedule": "every weekend",
+  "packageRules": [
+    {
+      "depTypeList": ["devDependencies"],
+      "automerge": true,
+      "extends": ["schedule:monthly"]
+    },
+    {
+      "packagePattern": "^@angular\/.*",
+      "groupName": "angular",
+      "pinVersions": false,
+      "automerge": true
+    },
+    {
+      "packagePattern": "^@angular-devkit\/.*",
+      "groupName": "angular devkit",
+      "pinVersions": false
+    },
+    {
+      "packagePattern": "^@ionic\/.*",
+      "groupName": "ionic"
+    },
+    {
+      "packagePattern": "^@ionic-native\/.*",
+      "groupName": "ionic native",
+      "pinVersions": true,
+      "automerge": true
+    },
+    {
+      "packagePattern": "^@types\/.*",
+      "groupName": "type definitions",
+      "pinVersions": false
+    },
+    {
+      "packagePattern": "^jasmine.*",
+      "groupName": "jasmine",
+      "pinVersions": false
+    },
+    {
+      "packagePattern": "^karma.*",
+      "groupName": "karma",
+      "pinVersions": false
+    },
+    {
+      "packageNames": [
+        "typescript"
+      ],
+      "updateTypes": "patch"
+    }
+  ],
+  "ignoreDeps": [
+    "@types/node",
+    "core-js"
+  ]
+}

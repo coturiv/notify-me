@@ -1,0 +1,10 @@
+:host {
+    ion-footer {
+        display: flex;
+        justify-content: space-evenly;
+
+        ion-button {
+            width: 40vw;
+        }
+    }
+}
